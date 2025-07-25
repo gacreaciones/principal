@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Carrito de Compras</h2>
+    
+    {% if cart_items %}
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Producto</th>
+                <th>Precio</th>
+                <th>Cantidad</th>
+                <th>Total</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in cart_items %}
+            <tr>
+                <td>
+                    <img src="{{ item.image }}" alt="{{ item.name }}" style="width: 50px; height: 50px; object-fit: cover;">
+                    {{ item.name }}
+                </td>
+                <td>${{ item.price }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('update_cart_quantity', product_id=item.id) }}">
+                        <input type="number" name="quantity" value="{{ item.quantity }}" min="1" max="{{ item.max_quantity }}" style="width: 60px;">
+                        <button type="submit" class="btn btn-sm btn-outline-primary">Actualizar</button>
+                    </form>
+                </td>
+                <td>${{ item.subtotal }}</td>
+                <td>
+                    <form method="POST" action="{{ url_for('remove_from_cart', product_id=item.id) }}">
+                        <button type="submit" class="btn btn-danger btn-sm">Eliminar</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" class="text-end"><strong>Total:</strong></td>
+                <td><strong>${{ total }}</strong></td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+    
+    <div class="d-flex justify-content-end">
+        <a href="{{ url_for('index') }}" class="btn btn-secondary me-2">Seguir Comprando</a>
+        <a href="{{ url_for('checkout') }}" class="btn btn-primary">Finalizar Compra</a>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        Tu carrito está vacío.
+    </div>
+    <a href="{{ url_for('index') }}" class="btn btn-primary">Volver a la Tienda</a>
+    {% endif %}
+</div>
+<script>
+// Para actualizar cantidad
+document.querySelectorAll('form[action^="/update_cart_quantity"]').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        fetch(this.action, {
+            method: 'POST',
+            body: new FormData(this)
+        })
+        .then(response => {
+            if (response.ok) {
+                // Disparar evento de actualización
+                const event = new Event('cartUpdated');
+                document.dispatchEvent(event);
+                
+                // Actualizar localStorage para otras pestañas
+                localStorage.setItem('cart_updated', Date.now());
+            }
+        });
+    });
+});
+
+// Para eliminar producto
+document.querySelectorAll('form[action^="/remove_from_cart"]').forEach(form => {
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        fetch(this.action, {
+            method: 'POST',
+            body: new FormData(this)
+        })
+        .then(response => {
+            if (response.ok) {
+                // Disparar evento de actualización
+                const event = new Event('cartUpdated');
+                document.dispatchEvent(event);
+                
+                // Actualizar localStorage para otras pestañas
+                localStorage.setItem('cart_updated', Date.now());
+                
+                // Recargar la página para ver cambios
+                location.reload();
+            }
+        });
+    });
+});
+</script>
+
+
+{% endblock %}

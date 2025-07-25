@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="text-center">Registrar Producto</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.nombre.label(class="form-label") }}
+                        {{ form.nombre(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.cantidad.label(class="form-label") }}
+                        {{ form.cantidad(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.precio.label(class="form-label") }}
+                        {{ form.precio(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.categoria.label(class="form-label") }}
+                        {{ form.categoria(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.imagen_url.label(class="form-label") }}
+                        {{ form.imagen_url(class="form-control") }}
+                    </div>
+                    <div class="d-grid">
+                        {{ form.submit(class="btn btn-success") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

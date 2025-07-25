@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    {% if empresa and empresa.logo_url %}
+    <div class="text-center mb-4">
+        <img src="{{ empresa.logo_url }}" alt="{{ empresa.nombre }}" class="img-fluid" style="max-height: 100px;">
+    </div>
+    {% endif %}
+    
+    <div class="row">
+        <!-- Panel principal (tienda) -->
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="mb-0">Nuestros Productos</h2>
+                <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#consultaDeudaModal">
+                    <i class="bi bi-search"></i> Consultar Deuda
+                </button>
+            </div>
+            
+            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-4">
+                {% for producto in productos %}
+                <div class="col">
+                    <div class="card h-100 border-0 shadow-sm product-card">
+                        <div class="position-relative">
+                            <img src="{{ producto.imagen_url }}" class="card-img-top product-img" alt="{{ producto.nombre }}">
+                            {% if producto.cantidad <= 0 %}
+                            <div class="position-absolute top-0 end-0 bg-danger text-white p-1 px-2 rounded-start">
+                                Agotado
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="card-body">
+                            <h5 class="card-title product-title">{{ producto.nombre }}</h5>
+                            <p class="card-text text-primary fw-bold mb-1">${{ producto.precio|round(2) }}</p>
+                            <p class="card-text text-muted small mb-2">
+                                <i class="bi bi-grid"></i> {{ producto.categoria }}
+                                {% if producto.cantidad > 0 %}
+                                <span class="ms-2">
+                                    <i class="bi bi-box"></i> {{ producto.cantidad }} disponibles
+                                </span>
+                                {% endif %}
+                            </p>
+                            
+                            {% if producto.cantidad > 0 %}
+                            <form method="POST" action="{{ url_for('add_to_cart', product_id=producto.id) }}">
+                                <div class="input-group">
+                                    <input type="number" name="quantity" class="form-control form-control-sm" 
+                                           value="1" min="1" max="{{ producto.cantidad }}">
+                                    <button class="btn btn-primary btn-sm" type="submit">
+                                        <i class="bi bi-cart-plus"></i>
+                                    </button>
+                                </div>
+                            </form>
+                            {% else %}
+                            <button class="btn btn-outline-secondary w-100 btn-sm" disabled>
+                                Producto no disponible
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        <i class="bi bi-info-circle me-2"></i>
+                        No hay productos disponibles en este momento.
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Panel lateral (carrito) -->
+        <div class="col-lg-3 mt-4 mt-lg-0">
+            <div class="sticky-top" style="top: 20px;">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">
+                            <i class="bi bi-cart me-2"></i> Tu Carrito
+                        </h5>
+                    </div>
+                    <div class="card-body p-0" id="cartSidebar">
+                        {% include 'partials/cart_sidebar.html' %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Consulta de Deuda -->
+<div class="modal fade" id="consultaDeudaModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Consulta de Deuda</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-center">Ingresa tu nombre para consultar tus deudas pendientes</p>
+                <form method="POST" action="{{ url_for('consulta_deuda_cliente') }}">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.nombre(class="form-control") }}
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Consultar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container position-fixed bottom-0 end-0 p-3">
+    <div id="addedToCartToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+        <div class="toast-header bg-success text-white">
+            <strong class="me-auto"><i class="bi bi-check-circle me-2"></i>Éxito</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            Producto añadido al carrito.
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .product-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+    
+    .product-img {
+        height: 180px;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+    
+    .product-card:hover .product-img {
+        transform: scale(1.05);
+    }
+    
+    .product-title {
+        font-size: 1rem;
+        height: 2.5rem;
+        overflow: hidden;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+    }
+    
+    @media (max-width: 768px) {
+        .product-img {
+            height: 150px;
+        }
+    }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Función para actualizar el carrito
+    function updateCart() {
+        fetch("{{ url_for('cart_sidebar_partial') }}")
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('cartSidebar').innerHTML = html;
+                assignRemoveEvents();
+                updateCartCount();
+            });
+    }
+    
+    // Función para actualizar el contador
+    function updateCartCount() {
+        fetch("{{ url_for('cart_count') }}")
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('cartBadge').textContent = data.count;
+                document.getElementById('cartNavCount').textContent = data.count;
+                document.getElementById('cartNavCount').style.display = data.count > 0 ? 'flex' : 'none';
+            });
+    }
+    
+    // Función para asignar eventos de eliminación
+    function assignRemoveEvents() {
+        document.querySelectorAll('.remove-item-form').forEach(form => {
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                fetch(this.action, {
+                    method: 'POST',
+                    body: new FormData(this)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        updateCart();
+                        // Mostrar notificación de eliminación
+                        showToast('Producto eliminado del carrito');
+                    }
+                });
+            });
+        });
+    }
+    
+    // Función para mostrar notificaciones
+    function showToast(message) {
+        const toastElement = document.getElementById('actionToast');
+        const toastBody = toastElement.querySelector('.toast-body');
+        toastBody.textContent = message;
+        
+        const toast = new bootstrap.Toast(toastElement);
+        toast.show();
+    }
+    
+    // Asignar eventos a los formularios de añadir al carrito
+    document.querySelectorAll('form[action^="/add_to_cart"]').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            fetch(this.action, {
+                method: 'POST',
+                body: new FormData(this)
+            })
+            .then(response => {
+                if (response.ok) {
+                    updateCart();
+                    showToast('Producto añadido al carrito');
+                }
+            });
+        });
+    });
+    
+    // Inicializar eventos
+    assignRemoveEvents();
+    
+    // Actualizar carrito al cargar la página
+    updateCart();
+});
+</script>
+{% endblock %}

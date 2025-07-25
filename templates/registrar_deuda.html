@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Registrar Nueva Deuda</h2>
+    
+    <!-- Formulario para cliente -->
+    <form method="POST" action="{{ url_for('registrar_deuda') }}">
+        {{ deuda_form.hidden_tag() }}
+        <div class="row mb-3">
+            <div class="col-md-12">
+                {{ deuda_form.cliente_id.label(class="form-label") }}
+                {{ deuda_form.cliente_id(class="form-select") }}
+            </div>
+        </div>
+        
+        <!-- Botón de guardar dentro del mismo formulario -->
+        <div class="d-grid mt-4">
+            {{ deuda_form.guardar(class="btn btn-success") }}
+        </div>
+    </form>
+    
+    <!-- Formulario separado para productos -->
+    <h4 class="mt-4">Agregar Productos</h4>
+    <form method="POST" action="{{ url_for('registrar_deuda') }}">
+        {{ producto_form.hidden_tag() }}
+        <div class="row mb-3">
+            <div class="col-md-6">
+                {{ producto_form.producto_id.label(class="form-label") }}
+                {{ producto_form.producto_id(class="form-select") }}
+            </div>
+            <div class="col-md-4">
+                {{ producto_form.cantidad.label(class="form-label") }}
+                {{ producto_form.cantidad(class="form-control") }}
+            </div>
+            <div class="col-md-2 d-flex align-items-end">
+                {{ producto_form.agregar(class="btn btn-primary") }}
+            </div>
+        </div>
+    </form>
+    
+    {% if productos_deuda %}
+    <div class="table-responsive mt-4">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio Unitario (USD)</th>
+                    <th>Subtotal (USD)</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for producto in productos_deuda %}
+                <tr>
+                    <td>
+                        {% if producto.precio is defined and producto.precio is number %}
+                            {{ producto.precio|round(2) }}
+                        {% else %}
+                            0.00
+                        {% endif %}
+                    </td>
+                    <td>{{ producto.nombre }}</td>
+                    <td>{{ producto.cantidad }}</td>
+                    <td>{{ producto['precio']|round(2) }}</td>
+                    <td>
+                        {% if producto.subtotal is defined and producto.subtotal is number %}
+                            {{ producto.subtotal|round(2) }}
+                        {% else %}
+                            0.00
+                        {% endif %}
+                    </td>
+                    <td>
+                        <form method="POST" action="{{ url_for('eliminar_producto_temp', index=loop.index0) }}">
+                            <button type="submit" class="btn btn-sm btn-danger">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="3" class="text-end fw-bold">Total:</td>
+                    <td class="fw-bold">
+                        {% if total is defined and total is number %}
+                            {{ total|round(2) }} USD
+                        {% else %}
+                            0.00 USD
+                        {% endif %}
+                    </td>
+                    <td></td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info mt-4">
+        No hay productos agregados
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

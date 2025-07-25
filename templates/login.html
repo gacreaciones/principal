@@ -1,0 +1,301 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <div class="login-icon">
+                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                    <polyline points="10,17 15,12 10,7"/>
+                    <line x1="15" y1="12" x2="3" y2="12"/>
+                </svg>
+            </div>
+            <h2 class="login-title">Acceso Dueño</h2>
+            <p class="login-subtitle">Ingresa tus credenciales para continuar</p>
+        </div>
+        
+        <form method="POST" class="login-form">
+            {{ form.hidden_tag() }}
+            
+            <div class="form-group">
+                {{ form.username.label(class="form-label") }}
+                <div class="input-wrapper">
+                    <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                    {{ form.username(class="form-input", placeholder="Ingresa tu usuario") }}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                {{ form.password.label(class="form-label") }}
+                <div class="input-wrapper">
+                    <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+                        <circle cx="12" cy="16" r="1"/>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+                    </svg>
+                    {{ form.password(class="form-input", placeholder="Ingresa tu contraseña") }}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                {{ form.submit(class="btn-submit") }}
+            </div>
+        </form>
+        
+        <div class="login-footer">
+            <p class="footer-text">¿Problemas para acceder? <a href="#" class="footer-link">Contacta soporte</a></p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .login-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 1px;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    }
+    
+    .login-card {
+        background: rgba(255, 255, 255, 0.95);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        padding: 40px;
+        width: 100%;
+        max-width: 420px;
+        animation: slideUp 0.6s ease-out;
+    }
+    
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .login-header {
+        text-align: center;
+        margin-bottom: 32px;
+    }
+    
+    .login-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #b9b8f3, #3c1deb);
+        border-radius: 20px;
+        color: white;
+        margin-bottom: 20px;
+        box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    }
+    
+    .login-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1a202c;
+        margin: 0 0 8px 0;
+        letter-spacing: -0.5px;
+    }
+    
+    .login-subtitle {
+        color: #718096;
+        font-size: 16px;
+        margin: 0;
+        font-weight: 400;
+    }
+    
+    .login-form {
+        margin-bottom: 24px;
+    }
+    
+    .form-group {
+        margin-bottom: 24px;
+    }
+    
+    .form-label {
+        display: block;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 8px;
+        font-size: 14px;
+        letter-spacing: 0.025em;
+    }
+    
+    .input-wrapper {
+        position: relative;
+    }
+    
+    .input-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #a0aec0;
+        z-index: 1;
+    }
+    
+    .form-input {
+        width: 100%;
+        padding: 16px 16px 16px 48px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 16px;
+        background: #f7fafc;
+        transition: all 0.3s ease;
+        box-sizing: border-box;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+    
+    .form-input::placeholder {
+        color: #a0aec0;
+    }
+    
+    .btn-submit {
+        width: 100%;
+        padding: 16px;
+        background: linear-gradient(135deg, #667eea, #4030d6);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        letter-spacing: 0.025em;
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+    }
+    
+    .btn-submit:active {
+        transform: translateY(0);
+    }
+    
+    .login-footer {
+        text-align: center;
+        padding-top: 20px;
+        border-top: 1px solid #e2e8f0;
+    }
+    
+    .footer-text {
+        color: #718096;
+        font-size: 14px;
+        margin: 0;
+    }
+    
+    .footer-link {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+    
+    .footer-link:hover {
+        color: #764ba2;
+        text-decoration: underline;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 480px) {
+        .login-container {
+            padding: 16px;
+        }
+        
+        .login-card {
+            padding: 32px 24px;
+        }
+        
+        .login-title {
+            font-size: 24px;
+        }
+        
+        .login-icon {
+            width: 64px;
+            height: 64px;
+        }
+        
+        .login-icon svg {
+            width: 32px;
+            height: 32px;
+        }
+    }
+    
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+        .login-card {
+            background: rgba(26, 32, 44, 0.95);
+            color: white;
+        }
+        
+        .login-title {
+            color: white;
+        }
+        
+        .form-label {
+            color: #e2e8f0;
+        }
+        
+        .form-input {
+            background: #2d3748;
+            border-color: #4a5568;
+            color: white;
+        }
+        
+        .form-input:focus {
+            background: #1a202c;
+            border-color: #667eea;
+        }
+        
+        .login-footer {
+            border-top-color: #4a5568;
+        }
+    }
+
+        @media (max-width: 576px) {
+        .login-card {
+            padding: 20px;
+            border-radius: 15px;
+        }
+        
+        .login-icon {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+        }
+        
+        .login-title {
+            font-size: 1.5rem;
+        }
+        
+        .form-input {
+            padding: 12px 12px 12px 40px;
+        }
+        
+        .input-icon {
+            left: 12px;
+        }
+    }
+</style>
+{% endblock %}

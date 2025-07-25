@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    {% if empresa and empresa.logo_url %}
+    <div class="text-center mb-4">
+        <img src="{{ empresa.logo_url }}" alt="{{ empresa.nombre }}" style="max-height: 100px;">
+    </div>
+    {% endif %}
+    
+    <h2 class="text-center mb-4">Nuestros Productos</h2>
+    
+    <div class="row">
+        {% for producto in productos %}
+        <div class="col-md-2 mb-2">
+            <div class="card h-50 product-card">
+                <img src="{{ producto.imagen_url }}" class="card-img-top product-img" alt="{{ producto.nombre }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ producto.nombre }}</h5>
+                    <p class="card-text">${{ producto.precio }}</p>
+                    <p class="card-text"><small>Categoría: {{ producto.categoria }}</small></p>
+                    <p class="card-text"><small>Disponibles: {{ producto.cantidad }}</small></p>
+                    
+                    {% if producto.cantidad > 0 %}
+                    <form method="POST" action="{{ url_for('add_to_cart', product_id=producto.id) }}">
+                        <div class="input-group">
+                            <input type="number" name="quantity" class="form-control" value="1" min="1" max="{{ producto.cantidad }}">
+                            <button class="btn btn-primary" type="submit">Agregar</button>
+                       
+                    <script>
+                                document.querySelectorAll('form[action^="/add_to_cart"]').forEach(form => {
+                                    form.addEventListener('submit', function(e) {
+                                        e.preventDefault();
+                                        
+                                        fetch(this.action, {
+                                            method: 'POST',
+                                            body: new FormData(this)
+                                        })
+                                        .then(response => {
+                                            if (response.ok) {
+                                                // Disparar evento de actualización
+                                                const event = new Event('cartUpdated');
+                                                document.dispatchEvent(event);
+                                                
+                                                // Actualizar localStorage para otras pestañas
+                                                localStorage.setItem('cart_updated', Date.now());
+                                                
+                                                // Mostrar mensaje de éxito
+                                                alert('Producto añadido al carrito');
+                                            }
+                                        });
+                                    });
+                                });
+                                </script>
+                        </div>
+                    </form>
+                    {% else %}
+                    <button class="btn btn-secondary w-100" disabled>Agotado</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                No hay productos disponibles en este momento.
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

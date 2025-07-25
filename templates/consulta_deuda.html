@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header bg-info text-white">
+        <h4>Deudas de {{ cliente['nombre'] }}</h4>
+    </div>
+    <div class="card-body">
+        {% if deudas %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Fecha</th>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario (USD)</th>
+                            <th>Subtotal (USD)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set total_general = namespace(value=0) %}
+                        {% for deuda in deudas %}
+                            {% for producto in deuda.productos %}
+                            <tr>
+                                <td>{{ deuda.fecha.strftime('%d/%m/%Y') }}</td>
+                                <td>{{ producto.producto.nombre }}</td>
+                                <td>{{ producto.cantidad }}</td>
+                                <td>{{ producto.producto['precio']|round(2) }}</td>
+                                <td>{{ (producto.cantidad * producto.producto['precio'])|round(2) }}</td>
+                                {% set total_general.value = total_general.value + (producto.cantidad * producto.producto['precio']) %}
+                            </tr>
+                            {% endfor %}
+                        {% endfor %}
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" class="text-end fw-bold">Total General:</td>
+                            <td class="fw-bold">{{ total_general.value|round(2) }} USD</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="d-flex justify-content-end gap-2">
+                <a href="{{ url_for('index') }}" class="btn btn-secondary">Cancelar</a>
+                <!-- Botón de pago modificado para manejar múltiples deudas -->
+                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#pagoModal">Pagar</button>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                No tiene deudas pendientes
+            </div>
+            <a href="{{ url_for('index') }}" class="btn btn-primary">Volver</a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal para selección de pago -->
+<div class="modal fade" id="pagoModal" tabindex="-1" aria-labelledby="pagoModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="pagoModalLabel">Seleccionar artículos a pagar</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="POST" action="{{ url_for('pagar_parcial') }}">
+                <div class="modal-body">
+                    <input type="hidden" name="cliente_id" value="{{ cliente['id'] }}">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Pagar</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for deuda in deudas %}
+                                {% for producto in deuda.productos %}
+                                <tr>
+                                    <td>{{ producto.producto.nombre }}</td>
+                                    <td>{{ producto.cantidad }}</td>
+                                    <td>
+                                        <input type="checkbox" name="productos[]" 
+                                            value="{{ deuda.id }}_{{ producto.id }}_{{ producto.cantidad }}">
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">Continuar al pago</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

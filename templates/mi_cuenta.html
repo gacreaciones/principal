@@ -1,0 +1,67 @@
+<!-- Crear nuevo archivo: templates/mi_cuenta.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Información de la Empresa</h2>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        {{ form.nombre.label(class="form-label") }}
+                        {{ form.nombre(class="form-control") }}
+                    </div>
+                    <div class="col-md-6">
+                        {{ form.telefono.label(class="form-label") }}
+                        {{ form.telefono(class="form-control") }}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.direccion.label(class="form-label") }}
+                    {{ form.direccion(class="form-control") }}
+                </div>
+                
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        {{ form.facebook.label(class="form-label") }}
+                        {{ form.facebook(class="form-control", placeholder="https://facebook.com/tuempresa") }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.instagram.label(class="form-label") }}
+                        {{ form.instagram(class="form-control", placeholder="https://instagram.com/tuempresa") }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.twitter.label(class="form-label") }}
+                        {{ form.twitter(class="form-control", placeholder="https://twitter.com/tuempresa") }}
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.logo_url.label(class="form-label") }}
+                    {{ form.logo_url(class="form-control", placeholder="https://drive.google.com/...") }}
+                    <small class="form-text text-muted">
+                        Sube tu logo a Google Drive, hazlo público y pega el enlace aquí.
+                        <a href="https://support.google.com/drive/answer/2494822" target="_blank">¿Cómo obtener enlace público?</a>
+                    </small>
+                    
+                    {% if form.logo_url.data %}
+                    <div class="mt-2">
+                        <img src="{{ form.logo_url.data }}" alt="Logo actual" style="max-height: 100px;" class="img-thumbnail">
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="d-flex justify-content-between">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Volver</a>
+                    {{ form.submit(class="btn btn-primary") }}
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

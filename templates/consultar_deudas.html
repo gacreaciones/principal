@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0">Consulta de Deudas</h2>
+            <p class="text-muted mb-0">Administra las deudas registradas en el sistema</p>
+        </div>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i> Volver
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" class="row g-3">
+                <div class="col-md-3">
+                    <label for="estado" class="form-label">Estado</label>
+                    <select class="form-select" name="estado" id="estado">
+                        <option value="todos" {% if estado_filtro == 'todos' %}selected{% endif %}>Todos</option>
+                        <option value="pendiente" {% if estado_filtro == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                        <option value="pagada" {% if estado_filtro == 'pagada' %}selected{% endif %}>Pagada</option>
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label for="cedula" class="form-label">Cedula del Cliente</label>
+                    <input type="text" class="form-control" name="cedula" id="cedula" value="{{ cedula_filtro }}">
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary me-2">Filtrar</button>
+                    <a href="{{ url_for('consultar_deudas') }}" class="btn btn-outline-secondary">Limpiar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Fecha</th>
+                            <th>Cliente</th>
+                            <th>Cedula</th>
+                            <th>Total (USD)</th>
+                            <th>Saldo (USD)</th>
+                            <th>Estado</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for deuda in deudas %}
+                            <tr>
+                                <td>{{ deuda.id }}</td>
+                                <td>
+                                    {% if deuda.fecha %}
+                                        {{ deuda.fecha.strftime('%d/%m/%Y') }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                                <td>{{ deuda.cliente_nombre }}</td>
+                                <td>{{ deuda.cliente_cedula }}</td>
+                                <td>{{ deuda.total|round(2) }}</td>
+                                <td>{{ deuda.saldo_pendiente|round(2) }}</td>
+                                <td>
+                                    <span class="badge bg-{{ 'success' if deuda.estado == 'pagada' else 'warning' }}">
+                                        {{ deuda.estado|capitalize }}
+                                    </span>
+                                </td>
+                                <td class="text-end">
+                                    <a href="{{ url_for('gestion_deudas', cliente_id=deuda.cliente_id) }}" 
+                                    class="btn btn-sm btn-outline-info" title="Gestionar Pagos">
+                                        <i class="bi bi-cash-coin"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center py-4">
+                                    <div class="py-4">
+                                        <i class="bi bi-receipt display-6 text-muted mb-3"></i>
+                                        <p>No hay deudas registradas con los filtros aplicados</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h3 class="text-center">Editar Producto</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('editar_producto', id=producto_id) }}">
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        {{ form.nombre.label(class="form-label") }}
+                        {{ form.nombre(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.cantidad.label(class="form-label") }}
+                        {{ form.cantidad(class="form-control", min="0") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.precio.label(class="form-label") }}
+                        {{ form.precio(class="form-control") }}
+                    </div>
+                                        <div class="mb-3">
+                        {{ form.categoria.label(class="form-label") }}
+                        {{ form.categoria(class="form-control") }}
+                    </div>
+                    <div class="mb-3">
+                        {{ form.imagen_url.label(class="form-label") }}
+                        {{ form.imagen_url(class="form-control") }}
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success">Actualizar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

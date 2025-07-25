@@ -1,0 +1,226 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h2 class="mb-0">Deudas de {{ cliente['nombre'] }} ({{ cliente['cedula'] }})</h2>
+            <p class="text-muted mb-0">Administra las deudas pendientes y pagadas</p>
+        </div>
+        <a href="{{ url_for('consultar_deudas') }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i> Volver
+        </a>
+    </div>
+
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <ul class="nav nav-tabs mb-4" id="deudasTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="pendientes-tab" data-bs-toggle="tab" data-bs-target="#pendientes" type="button" role="tab">
+                        Pendientes <span class="badge bg-warning ms-2">{{ deudas_pendientes|length }}</span>
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="pagadas-tab" data-bs-toggle="tab" data-bs-target="#pagadas" type="button" role="tab">
+                        Pagadas <span class="badge bg-success ms-2">{{ deudas_pagadas|length }}</span>
+                    </button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="deudasTabContent">
+                <!-- Pestaña de deudas pendientes -->
+                <div class="tab-pane fade show active" id="pendientes" role="tabpanel">
+                    {% if deudas_pendientes %}
+                        {% for deuda in deudas_pendientes %}
+                        <div class="card mb-4 border-start border-3 border-warning">
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Deuda #{{ deuda.id }} - {{ deuda.fecha.strftime('%d/%m/%Y') }}</h5>
+                                <div>
+                                    <span class="badge bg-warning">Pendiente</span>
+                                    <span class="ms-2">Saldo: ${{ deuda.saldo_pendiente|round(2) }} USD</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <!-- Tabla de productos -->
+                                <div class="table-responsive mb-4">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Producto</th>
+                                                <th>Cantidad</th>
+                                                <th>Precio Unitario (USD)</th>
+                                                <th>Subtotal (USD)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for producto in deuda.productos %}
+                                                <tr>
+                                                    <td>{{ producto.producto.nombre }}</td>
+                                                    <td>{{ producto.cantidad }}</td>
+                                                    <td>{{ producto.producto.precio|round(2) }}</td>
+                                                    <td>{{ producto.subtotal|round(2) }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="3" class="text-end fw-bold">Total Deuda:</td>
+                                                <td class="fw-bold">{{ deuda.total|round(2) }} USD</td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan="3" class="text-end fw-bold">Saldo Pendiente:</td>
+                                                <td class="fw-bold">{{ deuda.saldo_pendiente|round(2) }} USD</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                                
+                                <!-- Historial de pagos -->
+                                {% if deuda.pagos_parciales %}
+                                <div class="mt-4">
+                                    <h6>Historial de Pagos</h6>
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Fecha</th>
+                                                <th>Monto (USD)</th>
+                                                <th>Descripción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for pago in deuda.pagos_parciales %}
+                                            <tr>
+                                                <td>
+                                                    {% if pago.fecha %}
+                                                        {{ pago.fecha.strftime('%d/%m/%Y') }}
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ pago.monto_usd|round(2) }}</td>
+                                                <td>{{ pago.descripcion }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% endif %}
+                                
+                                <!-- Formulario de pago parcial -->
+                                <div class="border p-3 bg-light rounded mt-4">
+                                    <h5>Registrar Pago Parcial</h5>
+                                    <form method="POST" action="{{ url_for('registrar_pago_parcial', deuda_id=deuda.id) }}">
+                                        <input type="hidden" name="cliente_id" value="{{ cliente.id }}">
+                                        <div class="row g-3">
+                                            <div class="col-md-4">
+                                                <label class="form-label">Monto (USD)</label>
+                                                <input type="number" step="0.01" min="0.01" max="{{ deuda.saldo_pendiente }}"
+                                                    class="form-control" name="monto" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="form-label">Descripción</label>
+                                                <input type="text" class="form-control" name="descripcion" 
+                                                    placeholder="Ej: Pago parcial, Ajuste de deuda, etc.">
+                                            </div>
+                                            <div class="col-md-2 d-flex align-items-end">
+                                                <button type="submit" class="btn btn-primary">Registrar</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="alert alert-success">
+                            <i class="bi bi-check-circle me-2"></i> ¡Felicidades! No tiene deudas pendientes.
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Pestaña de deudas pagadas -->
+                <div class="tab-pane fade" id="pagadas" role="tabpanel">
+                    {% if deudas_pagadas %}
+                        {% for deuda in deudas_pagadas %}
+                        <div class="card mb-4 border-start border-3 border-success">
+                            <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                                <h5 class="mb-0">Deuda #{{ deuda.id }} - {{ deuda.fecha.strftime('%d/%m/%Y') }}</h5>
+                                <div>
+                                    <span class="badge bg-success">Pagada</span>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <!-- Tabla de productos -->
+                                <div class="table-responsive mb-4">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Producto</th>
+                                                <th>Cantidad</th>
+                                                <th>Precio Unitario (USD)</th>
+                                                <th>Subtotal (USD)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for producto in deuda.productos %}
+                                                <tr>
+                                                    <td>{{ producto.producto.nombre }}</td>
+                                                    <td>{{ producto.cantidad }}</td>
+                                                    <td>{{ producto.producto.precio|round(2) }}</td>
+                                                    <td>{{ producto.subtotal|round(2) }}</td>
+                                                </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <td colspan="3" class="text-end fw-bold">Total Deuda:</td>
+                                                <td class="fw-bold">{{ deuda.total|round(2) }} USD</td>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                                
+                                <!-- Historial de pagos -->
+                                {% if deuda.pagos_parciales %}
+                                <div class="mt-4">
+                                    <h6>Historial de Pagos</h6>
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th>Fecha</th>
+                                                <th>Monto (USD)</th>
+                                                <th>Descripción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for pago in deuda.pagos_parciales %}
+                                            <tr>
+                                                <td>
+                                                    {% if pago.fecha %}
+                                                        {{ pago.fecha.strftime('%d/%m/%Y') }}
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                </td>
+                                                <td>{{ pago.monto_usd|round(2) }}</td>
+                                                <td>{{ pago.descripcion }}</td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i> No tiene deudas pagadas registradas.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
