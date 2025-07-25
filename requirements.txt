@@ -1,12 +1,10 @@
 flask
 flask-sqlalchemy
-<<<<<<< HEAD
 flask-wtf
 flask-login
 flask-bcrypt
 python-dotenv
 psycopg2-binary
-=======
 psycopg2-binary
 firebase-admin==6.2.0
 python-dotenv==1.0.0
@@ -18,4 +16,3 @@ Werkzeug==2.3.7
 wtforms==3.0.1
 flask-wtf==1.1.1
 google-cloud-firestore==2.11.0
->>>>>>> 2e1079f2ea36c1ba79c2b9a3a2d9a263d0ad13ad
