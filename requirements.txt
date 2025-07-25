@@ -5,14 +5,8 @@ flask-login
 flask-bcrypt
 python-dotenv
 psycopg2-binary
-psycopg2-binary
 firebase-admin
-python-dotenv
-Flask
-flask-bcrypt
-flask-login
 gunicorn
 Werkzeug
 wtforms
-flask-wtf
-google-cloud-firestore
+google-cloud-firestor
