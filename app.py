@@ -1,5 +1,5 @@
 from flask import Flask, render_template, redirect, url_for, flash, request, session, abort, jsonify
-from extensions import db, bcrypt, login_manager
+from extensions import bcrypt, login_manager
 from flask_login import login_user, logout_user, login_required, current_user, UserMixin, LoginManager, AnonymousUserMixin
 from forms import ConsultaDeudaForm, PagoForm, LoginForm, ProductoForm, DeudaForm, ProductoDeudaForm, ClienteForm, DeudaForm, ProductoDeudaForm, ChangePasswordForm, EmpresaForm,EmptyForm, CheckoutForm
 from models import Cliente, Producto, Deuda, ProductoDeuda
