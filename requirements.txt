@@ -9,4 +9,4 @@ firebase-admin
 gunicorn
 Werkzeug
 wtforms
-google-cloud-firestor
+google-cloud-firestore==2.11.0
